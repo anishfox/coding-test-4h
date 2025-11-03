@@ -421,21 +421,38 @@ docker-compose up -d
 
 ## Submission Requirements
 
-### Required Items
-1. **Source Code** (complete project)
-2. **README.md** (execution instructions, implementation details)
-3. **Screenshots** (minimum 5):
-   - Document upload screen
-   - Document processing completion screen
-   - Chat interface
-   - Answer example with images
-   - Answer example with tables
-4. **Sample PDF** (PDF file used for testing)
+### What to Submit
+1. **GitHub Repository** (public or private with access)
+2. **Complete source code** (backend + frontend)
+3. **Docker configuration** (docker-compose.yml)
+4. **Documentation** (README, API docs, architecture)
+5. **Sample data** (at least one test PDF)
 
-### Optional Items
-- Test results report
-- Performance benchmark results
-- Deployment URL (if available)
+### README Must Include
+- Project overview
+- Tech stack
+- Setup instructions (Docker)
+- Environment variables (.env.example)
+- API testing examples
+- Features implemented
+- Known limitations
+- Future improvements
+- Screenshots (minimum 5):
+  - Document upload screen
+  - Document processing completion screen
+  - Chat interface
+  - Answer example with images
+  - Answer example with tables
+
+### Timeline
+- **Recommended**: 1 week (Core features)
+- **Maximum**: 2 weeks (With bonus features)
+
+### How to Submit
+1. Push code to GitHub
+2. Test that `docker-compose up` works
+3. Send repository URL via email
+4. Include any special instructions
 
 ---
 
@@ -490,19 +507,152 @@ Each file contains detailed TODO comments with implementation hints and examples
 
 ---
 
+## Troubleshooting
+
+### Document Processing Issues
+**Problem**: Docling can't extract tables
+**Solution**: 
+- Check PDF format (ensure it's not scanned image)
+- Add fallback parsing logic
+- Manually define table structure patterns
+
+### LLM API Costs
+**Problem**: OpenAI API is expensive
+**Solution**: Use free alternatives
+- Use caching for repeated queries
+- Use cheaper models (gpt-3.5-turbo)
+- Use local LLM (Ollama) for development
+
+### Vector Search Issues
+**Problem**: Search results are not relevant
+**Solution**:
+- Verify embedding model is working
+- Check chunk size and overlap settings
+- Ensure pgvector extension is installed
+- Test with simple queries first
+
+### CORS Issues
+**Problem**: Frontend can't call backend API
+**Solution**:
+- Add CORS middleware in FastAPI
+- Allow origin: http://localhost:3000
+- Check network configuration in Docker
+
+---
+
+## Free LLM Options
+
+You don't need to pay for OpenAI API! Here are free alternatives:
+
+### Option 1: Ollama (Recommended for Development)
+
+**Completely free, runs locally on your machine**
+
+1. **Install Ollama**
+```bash
+# Mac
+brew install ollama
+
+# Linux
+curl -fsSL https://ollama.com/install.sh | sh
+
+# Windows
+# Download from https://ollama.com/download
+```
+
+2. **Download a model**
+```bash
+# Llama 3.2 (3B - fast, good for development)
+ollama pull llama3.2
+
+# Or Llama 3.1 (8B - better quality)
+ollama pull llama3.1
+
+# Or Mistral (7B - good balance)
+ollama pull mistral
+```
+
+3. **Update your .env**
+```bash
+# Use Ollama instead of OpenAI
+LLM_PROVIDER=ollama
+OLLAMA_BASE_URL=http://localhost:11434
+OLLAMA_MODEL=llama3.2
+```
+
+**Pros**: Free, private, no API limits, works offline
+**Cons**: Requires decent hardware (8GB+ RAM), slower than cloud APIs
+
+---
+
+### Option 2: Google Gemini (Free Tier)
+
+**Free tier: 60 requests per minute**
+
+1. **Get free API key**
+   - Go to https://makersuite.google.com/app/apikey
+   - Click "Create API Key"
+   - Copy your key
+
+2. **Update .env**
+```bash
+GOOGLE_API_KEY=your-gemini-api-key
+LLM_PROVIDER=gemini
+```
+
+**Pros**: Free, fast, good quality
+**Cons**: Rate limits, requires internet
+
+---
+
+### Option 3: Groq (Free Tier)
+
+**Free tier: Very fast inference, generous limits**
+
+1. **Get free API key**
+   - Go to https://console.groq.com
+   - Sign up and get API key
+
+2. **Update .env**
+```bash
+GROQ_API_KEY=your-groq-api-key
+LLM_PROVIDER=groq
+```
+
+**Pros**: Free, extremely fast, good quality
+**Cons**: Rate limits, requires internet
+
+---
+
+### Comparison Table
+
+| Provider | Cost | Speed | Quality | Setup |
+|----------|------|-------|---------|-------|
+| **Ollama** | Free | Medium | Good | Easy |
+| **Gemini** | Free | Fast | Very Good | Very Easy |
+| **Groq** | Free | Very Fast | Good | Very Easy |
+| OpenAI | Paid | Fast | Excellent | Very Easy |
+
+**Recommended**: Use **Ollama** for development (free, no limits)
+
+---
+
 ## FAQ
 
 **Q: Docling won't install.**
 A: Try `pip install docling` or use the Docker image.
 
 **Q: I don't have an OpenAI API key.**
-A: You can install Ollama locally and use a free LLM.
+A: You can install Ollama locally and use a free LLM (see Free LLM Options section).
 
 **Q: Where should I save images?**
 A: Save to `backend/uploads/images/` directory and store only the path in DB.
 
 **Q: How should I display tables?**
 A: Render tables as images or display JSON data as HTML tables in frontend.
+
+**Q: How do I test the system locally?**
+A: Follow the Getting Started section and use the provided sample PDF (1706.03762v7.pdf).
 
 ---
 
@@ -511,3 +661,29 @@ A: Render tables as images or display JSON data as HTML tables in frontend.
 If you have any questions, please create an issue or contact us via email.
 
 Good luck!
+
+---
+
+## Tips for Success
+
+1. **Start Simple**: Get core features working before adding advanced features
+2. **Test Early**: Test document processing with sample PDF immediately
+3. **Use Tools**: Leverage Docling, LangChain to save time
+4. **Focus on Core**: Perfect the RAG pipeline first
+5. **Document Well**: Clear README helps evaluators understand your work
+6. **Handle Errors**: Graceful error handling shows maturity
+7. **Ask Questions**: If requirements are unclear, document your assumptions
+
+---
+
+## Support
+
+For questions about this coding challenge:
+- Open an issue in this repository
+- Email: [your-contact-email]
+
+---
+
+**Version**: 1.0  
+**Last Updated**: 2025-11-03  
+**Author**: InterOpera-Apps Hiring Team

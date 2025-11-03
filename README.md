@@ -676,7 +676,7 @@ Good luck!
 
 For questions about this coding challenge:
 - Open an issue in this repository
-- Email: recruit@interopera.co
+- Email: recruitment@interopera.co
 
 ---
 

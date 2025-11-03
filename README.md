@@ -444,10 +444,6 @@ docker-compose up -d
   - Answer example with images
   - Answer example with tables
 
-### Timeline
-- **Recommended**: 1 week (Core features)
-- **Maximum**: 2 weeks (With bonus features)
-
 ### How to Submit
 1. Push code to GitHub
 2. Test that `docker-compose up` works
@@ -680,7 +676,7 @@ Good luck!
 
 For questions about this coding challenge:
 - Open an issue in this repository
-- Email: [your-contact-email]
+- Email: recruit@interopera.co
 
 ---
 

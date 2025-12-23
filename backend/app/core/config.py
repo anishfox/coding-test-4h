@@ -16,17 +16,16 @@ class Settings(BaseSettings):
     # Redis
     REDIS_URL: str = "redis://localhost:6379/0"
     
-    # OpenAI
-    OPENAI_API_KEY: Optional[str] = None
-    OPENAI_MODEL: str = "gpt-4o-mini"
-    OPENAI_EMBEDDING_MODEL: str = "text-embedding-3-small"
+    # Gemini API
+    GOOGLE_API_KEY: str
+    GEMINI_MODEL: str = "gemini-1.5-flash"
     
     # Upload Settings
     UPLOAD_DIR: str = "./uploads"
     MAX_FILE_SIZE: int = 50 * 1024 * 1024  # 50 MB
     
     # Vector Store Settings
-    EMBEDDING_DIMENSION: int = 1536  # OpenAI text-embedding-3-small
+    EMBEDDING_DIMENSION: int = 384  # sentence-transformers all-MiniLM-L6-v2
     CHUNK_SIZE: int = 1000
     CHUNK_OVERLAP: int = 200
     TOP_K_RESULTS: int = 5
@@ -37,3 +36,4 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
+

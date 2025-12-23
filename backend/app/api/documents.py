@@ -58,9 +58,9 @@ async def upload_document(
     db.commit()
     db.refresh(document)
     
-    # TODO: Trigger background processing
-    # background_tasks.add_task(process_document_task, document.id, file_path, db)
-    # For now, you can process synchronously or implement Celery
+    # Trigger background processing
+    if background_tasks:
+        background_tasks.add_task(process_document_task, document.id, file_path)
     
     return {
         "id": document.id,
@@ -68,6 +68,34 @@ async def upload_document(
         "status": document.processing_status,
         "message": "Document uploaded successfully. Processing will begin shortly."
     }
+
+
+async def process_document_task(document_id: int, file_path: str):
+    """
+    Background task to process a document
+    """
+    from app.db.session import SessionLocal
+    
+    db = SessionLocal()
+    try:
+        processor = DocumentProcessor(db)
+        # process_document expects (file_path, document_id)
+        await processor.process_document(file_path, document_id)
+    except Exception as e:
+        print(f"Error processing document {document_id}: {e}")
+        import traceback
+        traceback.print_exc()
+        # Update document with error status
+        try:
+            doc = db.query(Document).filter(Document.id == document_id).first()
+            if doc:
+                doc.processing_status = "error"
+                doc.error_message = str(e)
+                db.commit()
+        except:
+            pass
+    finally:
+        db.close()
 
 
 @router.get("")

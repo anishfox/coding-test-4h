@@ -9,10 +9,33 @@ from app.core.config import settings
 from app.db.session import engine
 from app.models import document, conversation
 import os
+from sqlalchemy import text
+import time
 
-# Create database tables
-document.Base.metadata.create_all(bind=engine)
-conversation.Base.metadata.create_all(bind=engine)
+# Retry connecting to database
+max_retries = 5
+retry_count = 0
+while retry_count < max_retries:
+    try:
+        with engine.connect() as conn:
+            try:
+                conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector"))
+                conn.commit()
+            except Exception as e:
+                # Extension might already exist, this is fine
+                print(f"Note: pgvector extension status: {e}")
+        
+        # Create database tables
+        document.Base.metadata.create_all(bind=engine)
+        conversation.Base.metadata.create_all(bind=engine)
+        break
+    except Exception as e:
+        retry_count += 1
+        if retry_count >= max_retries:
+            print(f"Failed to connect to database after {max_retries} retries: {e}")
+            raise
+        print(f"Database not ready, retrying in 2 seconds... (attempt {retry_count}/{max_retries})")
+        time.sleep(2)
 
 app = FastAPI(
     title="Multimodal Document Chat System",

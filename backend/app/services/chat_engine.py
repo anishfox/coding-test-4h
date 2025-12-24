@@ -48,8 +48,14 @@ class ChatEngine:
         try:
             import google.generativeai as genai
             genai.configure(api_key=settings.GOOGLE_API_KEY)
-            self.llm = genai.GenerativeModel(settings.GEMINI_MODEL)
-            logger.info(f"Gemini LLM initialized: {settings.GEMINI_MODEL}")
+            
+            # Remove 'models/' prefix if present
+            model_name = settings.GEMINI_MODEL
+            if model_name.startswith('models/'):
+                model_name = model_name[7:]  # Remove 'models/' prefix
+            
+            self.llm = genai.GenerativeModel(model_name)
+            logger.info(f"Gemini LLM initialized: {model_name}")
         except ImportError:
             logger.error("google-generativeai not installed. Install with: pip install google-generativeai")
             raise

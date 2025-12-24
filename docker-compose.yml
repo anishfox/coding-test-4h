@@ -39,13 +39,14 @@ services:
     environment:
       - DATABASE_URL=postgresql://docuser:docpass@postgres:5432/docdb
       - REDIS_URL=redis://redis:6379/0
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
-      - OPENAI_MODEL=${OPENAI_MODEL:-gpt-4o-mini}
-      - OPENAI_EMBEDDING_MODEL=${OPENAI_EMBEDDING_MODEL:-text-embedding-3-small}
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+      - GEMINI_MODEL=${GEMINI_MODEL:-models/gemini-1.5-flash}
       - UPLOAD_DIR=/app/uploads
+      - HF_HOME=/root/.cache/huggingface
     volumes:
       - ./backend:/app
       - backend_uploads:/app/uploads
+      - huggingface_cache:/root/.cache/huggingface
     depends_on:
       postgres:
         condition: service_healthy
@@ -74,3 +75,4 @@ volumes:
   postgres_data:
   redis_data:
   backend_uploads:
+  huggingface_cache:

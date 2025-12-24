@@ -61,36 +61,50 @@ async def send_message(
     user_message = Message(
         conversation_id=conversation.id,
         role="user",
-        content=request.message
+        content=request.message,
+        sources=[]  # Empty list for user messages
     )
     db.add(user_message)
     db.commit()
     
-    # TODO: Process message with ChatEngine
-    # chat_engine = ChatEngine(db)
-    # result = await chat_engine.process_message(
-    #     conversation_id=conversation.id,
-    #     message=request.message,
-    #     document_id=request.document_id
-    # )
-    
-    # For now, return placeholder response
-    result = {
-        "answer": "This is a placeholder response. Implement ChatEngine to process messages.",
-        "sources": [],
-        "processing_time": 0.0
-    }
+    # Process message with ChatEngine
+    try:
+        chat_engine = ChatEngine(db)
+        result = await chat_engine.process_message(
+            conversation_id=conversation.id,
+            message=request.message,
+            document_id=request.document_id
+        )
+    except Exception as e:
+        # Rollback on error to avoid transaction issues
+        db.rollback()
+        result = {
+            "answer": f"Error processing your message: {str(e)}",
+            "sources": [],
+            "processing_time": 0.0
+        }
     
     # Save assistant message
-    assistant_message = Message(
-        conversation_id=conversation.id,
-        role="assistant",
-        content=result["answer"],
-        sources=result.get("sources", [])
-    )
-    db.add(assistant_message)
-    db.commit()
-    db.refresh(assistant_message)
+    try:
+        assistant_message = Message(
+            conversation_id=conversation.id,
+            role="assistant",
+            content=result["answer"],
+            sources=result.get("sources", [])  # Pass list directly, not json.dumps
+        )
+        db.add(assistant_message)
+        db.commit()
+        db.refresh(assistant_message)
+    except Exception as e:
+        db.rollback()
+        # Still return response even if save fails
+        return ChatResponse(
+            conversation_id=conversation.id,
+            message_id=0,
+            answer=result["answer"],
+            sources=result.get("sources", []),
+            processing_time=result.get("processing_time", 0.0)
+        )
     
     return ChatResponse(
         conversation_id=conversation.id,

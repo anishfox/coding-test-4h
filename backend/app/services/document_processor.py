@@ -78,10 +78,33 @@ class DocumentProcessor:
             logger.info(f"Starting document processing for document_id: {document_id}")
             
             # Parse PDF using Docling
-            from docling.document_converter import DocumentConverter
-            
-            converter = DocumentConverter()
-            doc_result = converter.convert(file_path)
+            try:
+                from docling.document_converter import DocumentConverter
+                converter = DocumentConverter()
+                doc_result = converter.convert(file_path)
+                logger.info(f"PDF parsed successfully with Docling. Total pages: {len(doc_result.pages)}")
+            except Exception as e:
+                logger.warning(f"Docling conversion failed, falling back to PyPDF: {e}")
+                # Fallback to PyPDF for simple text extraction
+                import pypdf
+                
+                class SimpleDocResult:
+                    def __init__(self, pages):
+                        self.pages = pages
+                
+                class SimplePage:
+                    def __init__(self, page_num, text):
+                        self.text = text
+                
+                pdf_pages = []
+                with open(file_path, 'rb') as f:
+                    reader = pypdf.PdfReader(f)
+                    for page_num, page in enumerate(reader.pages, 1):
+                        text = page.extract_text()
+                        pdf_pages.append(SimplePage(page_num, text))
+                
+                doc_result = SimpleDocResult(pdf_pages)
+                logger.info(f"PDF parsed with PyPDF fallback. Total pages: {len(pdf_pages)}")
             
             logger.info(f"PDF parsed successfully. Total pages: {len(doc_result.pages)}")
             

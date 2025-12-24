@@ -2,18 +2,24 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# Install system dependencies for Docling and PDF processing
 RUN apt-get update && apt-get install -y \
     build-essential \
     libpoppler-cpp-dev \
     poppler-utils \
     tesseract-ocr \
+    libgl1 \
+    libglib2.0-0 \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements and install Python dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Pre-download Docling models to avoid cache issues
-RUN python -c "from docling.document_converter import DocumentConverter; DocumentConverter()" || true
+COPY . .
 
+# Create uploads directory
+RUN mkdir -p uploads/documents uploads/images uploads/tables
+
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+
+
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]

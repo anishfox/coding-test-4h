@@ -124,26 +124,6 @@ class ChatEngine:
             # 5. Format sources
             sources = self._format_sources(context, media)
             
-            # 6. Save user message to database
-            user_msg = Message(
-                conversation_id=conversation_id,
-                role="user",
-                content=message,
-                sources=json.dumps([])
-            )
-            self.db.add(user_msg)
-            self.db.commit()
-            
-            # Save assistant response to database
-            assistant_msg = Message(
-                conversation_id=conversation_id,
-                role="assistant",
-                content=answer,
-                sources=json.dumps(sources)
-            )
-            self.db.add(assistant_msg)
-            self.db.commit()
-            
             processing_time = time.time() - start_time
             logger.info(f"Message processed in {processing_time:.2f}s")
             
